@@ -1,0 +1,8 @@
+
+{
+  "name": "GuroAI Chat",
+  "description": "An advanced AI assistant with multiple personalities, voice control, and image analysis capabilities.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

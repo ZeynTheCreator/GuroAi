@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuroAI</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/genai": "https://esm.sh/@google/genai@^0.12.0"
+        }
+      }
+    </script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body data-theme="dark-theme" data-accent-color="red">
+    <div id="app-container">
+        <header id="app-header">
+            <div class="header-left">
+                <h1>GuroAI</h1>
+            </div>
+            <div class="header-center">
+                <label for="mode-select" class="visually-hidden">AI Mode:</label>
+                <select id="mode-select" aria-label="Select AI Mode">
+                    <option value="Normal">Normal</option>
+                    <option value="News">News</option>
+                    <option value="Fitness">Fitness</option>
+                    <option value="Code">Code</option>
+                    <option value="Thinker">Thinker</option>
+                    <option value="Math">Math</option>
+                </select>
+                <!-- Manage Modes button was previously removed, but is present in this file from user -->
+                <button id="manage-modes-button" title="Manage Custom Modes" aria-label="Manage Custom AI Modes">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M16.5 3C17.3284 3 18 3.67157 18 4.5V19.5C18 20.3284 17.3284 21 16.5 21H7.5C6.67157 21 6 20.3284 6 19.5V4.5C6 3.67157 6.67157 3 7.5 3H16.5ZM11.25 12.75H8.25V14.25H11.25V12.75ZM15.75 9.75H8.25V11.25H15.75V9.75ZM15.75 6.75H8.25V8.25H15.75V6.75Z"/></svg>
+                    Modes
+                </button>
+            </div>
+            <div class="header-right controls">
+                <div id="color-picker" aria-label="Select Accent Color">
+                    <button class="color-option" data-color="red" aria-label="Red accent"></button>
+                    <button class="color-option" data-color="green" aria-label="Green accent"></button>
+                    <button class="color-option" data-color="blue" aria-label="Blue accent"></button>
+                    <button class="color-option" data-color="purple" aria-label="Purple accent"></button>
+                    <button class="color-option" data-color="orange" aria-label="Orange accent"></button>
+                    <button class="color-option" data-color="yellow" aria-label="Yellow accent"></button>
+                    <!-- Pink color option removed -->
+                </div>
+                <button id="theme-toggle" aria-label="Toggle Theme" title="Toggle Theme">🌓</button>
+                <button id="fullscreen-toggle" aria-label="Toggle Fullscreen" title="Toggle Fullscreen">⛶</button>
+                <button id="clear-chat" aria-label="Clear Chat" title="Clear Chat">🗑️</button>
+            </div>
+        </header>
+
+        <main id="chat-area">
+            <div id="messages-container" aria-live="polite">
+                <!-- Messages will be appended here -->
+            </div>
+        </main>
+
+        <footer id="input-area">
+            <div id="file-previews">
+                <div id="image-preview-container" style="display: none;">
+                    <img id="image-preview" src="#" alt="Image preview" />
+                    <button id="remove-image-preview" class="remove-preview-button" aria-label="Remove image preview">&times;</button>
+                </div>
+                <div id="pdf-preview-container" style="display: none;">
+                    <span id="pdf-preview-icon">📄</span>
+                    <p id="pdf-preview-name"></p>
+                    <button id="remove-pdf-preview" class="remove-preview-button" aria-label="Remove PDF preview">&times;</button>
+                </div>
+            </div>
+            <div class="input-controls-row1">
+                <label for="image-upload" class="file-upload-button" aria-label="Upload Image" title="Upload Image">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M4 4H8L10 2H14L16 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4ZM12 17C14.76 17 17 14.76 17 12C17 9.24 14.76 7 12 7C9.24 7 7 9.24 7 12C7 14.76 9.24 17 12 17ZM12 15C10.34 15 9 13.66 9 12C9 10.34 10.34 9 12 9C13.66 9 15 10.34 15 12C15 13.66 13.66 15 12 15Z"/></svg>
+                    Image
+                </label>
+                <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                
+                <label for="pdf-upload" class="file-upload-button" aria-label="Upload PDF" title="Upload PDF">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2ZM13 9V3.5L18.5 9H13ZM8 18H16V16H8V18ZM8 14H16V12H8V14ZM8 10H12V8H8V10Z"/></svg>
+                    PDF
+                </label>
+                <input type="file" id="pdf-upload" accept=".pdf" style="display: none;">
+                <small id="pdf-info" style="font-size: 0.7em; margin-left: 5px; opacity: 0.7;">(Text extraction required)</small>
+            </div>
+            <div class="input-controls-row2">
+                <button id="voice-input-toggle" aria-label="Toggle Voice Input" title="Toggle Voice Input">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14ZM10.8 4.9C10.8 4.4 11.2 4 11.7 4H12.3C12.8 4 13.2 4.4 13.2 4.9V11.1C13.2 11.6 12.8 12 12.3 12H11.7C11.2 12 10.8 11.6 10.8 11.1V4.9ZM19 10H17V11C17 13.76 14.76 16 12 16C9.24 16 7 13.76 7 11V10H5V11C5 14.53 7.71 17.43 11.22 17.93V21H12.78V17.93C16.29 17.43 19 14.53 19 11V10Z"/></svg>
+                </button>
+                <select id="language-select" aria-label="Select Voice Input Language">
+                    <option value="en-US">English (US)</option>
+                    <option value="fr-FR">Français</option>
+                    <option value="ar-SA">العربية</option>
+                    <option value="de-DE">Deutsch</option>
+                    <option value="ru-RU">Русский</option>
+                    <option value="es-ES">Español</option>
+                    <option value="ja-JP">日本語</option>
+                </select>
+                <textarea id="chat-input" placeholder="Ask GuroAI anything..." aria-label="Chat input" rows="1"></textarea>
+                <button id="send-button" aria-label="Send Message" title="Send Message">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/></svg>
+                </button>
+            </div>
+        </footer>
+        <div id="loading-indicator" style="display: none;"><span>GuroAI is thinking...</span></div>
+    </div>
+
+    <!-- Custom Mode Modal -->
+    <div id="custom-mode-modal" class="modal" style="display: none;" aria-labelledby="custom-mode-modal-title" role="dialog" aria-modal="true">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close-button" aria-label="Close modal">&times;</button>
+            <h2 id="custom-mode-modal-title">Manage Custom Modes</h2>
+            
+            <div id="custom-modes-list-container">
+                <h3>Your Modes</h3>
+                <ul id="custom-modes-list">
+                    <!-- Custom modes will be listed here -->
+                    <li class="no-custom-modes" style="display:none;">You haven't created any custom modes yet.</li>
+                </ul>
+            </div>
+
+            <div id="custom-mode-form-container">
+                <h3 id="custom-mode-form-title">Create New Mode</h3>
+                <form id="custom-mode-form">
+                    <input type="hidden" id="editing-mode-index" value="-1">
+                    <div>
+                        <label for="custom-mode-name-input">Mode Name:</label>
+                        <input type="text" id="custom-mode-name-input" required placeholder="e.g., Sarcastic Helper">
+                    </div>
+                    <div>
+                        <label for="custom-mode-instruction-input">System Instruction (Personality):</label>
+                        <textarea id="custom-mode-instruction-input" rows="5" required placeholder="e.g., You are a helpful assistant, but you are also very sarcastic."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="submit" id="save-custom-mode-button">Save Mode</button>
+                        <button type="button" id="cancel-edit-custom-mode-button" style="display: none;">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="index.tsx"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
